@@ -5,6 +5,12 @@ from fastapi import FastAPI
 from fastapi import Body, Query, Path
 
 
+class Location(BaseModel):
+    city: str
+    state: str
+    contry: str
+
+
 class Person(BaseModel):
     first_name: str
     last_name: str
@@ -48,3 +54,15 @@ def show_person(
 def show_person(person_id: int = Path(..., gt=0, title='Person Id',
                                       description='This is the person ID, It´s greater than 0 and required')):
     return {person_id: 'it exist'}
+
+
+@app.put('/person/{person_id}')
+def update_person(
+    person_id: int = Path(..., gt=0, title='PersonId',
+                          description='This is the person ID, It´s greater than 0 and required'),
+    location: Location = Body(...),
+    person: Person = Body(...)
+):
+    result = location.dict()
+    result.update(person.dict())
+    return result
