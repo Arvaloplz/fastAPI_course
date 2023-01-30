@@ -72,7 +72,7 @@ def show_person(
 
 # * Validation: Path parameter
 
-
+# * path parameter es obligatorio
 @app.get('/person/detail/{person_id}')
 def show_person(person_id: int = Path(..., gt=0, title='Person Id',
                                       description='This is the person ID, It´s greater than 0 and required', example=34)):
