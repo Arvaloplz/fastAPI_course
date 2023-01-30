@@ -2,7 +2,7 @@
 from typing import Optional
 from pydantic import BaseModel
 from fastapi import FastAPI
-from fastapi import Body
+from fastapi import Body, Query
 
 
 class Person(BaseModel):
@@ -27,3 +27,14 @@ def Home():     # * Path Operation function
 def create_person(person: Person = Body(...)):
     # Body(...) quiere decir que el parametro es obligatorio lol
     return person
+
+# * Validation: Query parameter
+
+
+@app.get('/person/detail')
+def show_person(
+    name: Optional[str] = Query(None, min_length=1, max_length=50),
+    # no se utiliza obligatorio practicamente nunca
+    age: Optional[int] = Query(...)
+):
+    return {name: age}
