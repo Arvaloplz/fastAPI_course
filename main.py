@@ -63,10 +63,10 @@ def create_person(person: Person = Body(...)):
 @app.get('/person/detail')
 def show_person(
     name: Optional[str] = Query(None, min_length=1, max_length=50, title='Person Name',
-                                description='This is the person name, It´s between 1 and 50 characters'),
+                                description='This is the person name, It´s between 1 and 50 characters', example='dremian'),
     # no se utiliza obligatorio practicamente nunca
     age: Optional[int] = Query(..., title='Person Age',
-                               description='This is the person age, It´s required')
+                               description='This is the person age, It´s required', example=31)
 ):
     return {name: age}
 
@@ -75,14 +75,14 @@ def show_person(
 
 @app.get('/person/detail/{person_id}')
 def show_person(person_id: int = Path(..., gt=0, title='Person Id',
-                                      description='This is the person ID, It´s greater than 0 and required')):
+                                      description='This is the person ID, It´s greater than 0 and required', example=34)):
     return {person_id: 'it exist'}
 
 
 @app.put('/person/{person_id}')
 def update_person(
     person_id: int = Path(..., gt=0, title='PersonId',
-                          description='This is the person ID, It´s greater than 0 and required'),
+                          description='This is the person ID, It´s greater than 0 and required', example=54),
     location: Location = Body(...),
     person: Person = Body(...)
 ):
