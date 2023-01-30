@@ -3,7 +3,7 @@ from typing import Optional
 from enum import Enum
 from pydantic import BaseModel, Field, EmailStr
 from fastapi import FastAPI
-from fastapi import Body, Query, Path
+from fastapi import Body, Query, Path, status
 
 
 class HairColor(Enum):
@@ -20,13 +20,17 @@ class Location(BaseModel):
     contry: str = Field(default=None, example='Chile')
 
 
-class Person(BaseModel):
+class PersonBase(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=50)
     last_name: str = Field(..., min_length=1, max_length=50)
     email: EmailStr = Field(...)
     age: int = Field(..., gt=0, lt=115)
     hair_color: Optional[HairColor] = Field(default=None)
     is_married: Optional[bool] = Field(default=None)
+
+
+class Person(PersonBase):
+    password: str = Field(..., min_length=8)
 
     class Config:
         # * Default body
@@ -42,17 +46,19 @@ class Person(BaseModel):
         }
 
 
+class PersonOut(PersonBase):
+    pass
+
+
 app = FastAPI()
 
 
-@app.get('/')   # * Path Operation decoration
-def Home():     # * Path Operation function
+@app.get(path='/', status_code=status.HTTP_200_OK)  #  Path Operation decoration
+def Home():  # Path Operation function
     return {'hello ': 'world'}
 
-# * Req Res
 
-
-@app.post('/person/new')
+@app.post('/person/new', status_code=status.HTTP_201_CREATED, response_model=PersonOut)
 def create_person(person: Person = Body(...)):
     # Body(...) quiere decir que el parametro es obligatorio lol
     return person
@@ -60,29 +66,39 @@ def create_person(person: Person = Body(...)):
 # * Validation: Query parameter
 
 
-@app.get('/person/detail')
+@app.get('/person/detail', status_code=status.HTTP_200_OK)
 def show_person(
-    name: Optional[str] = Query(None, min_length=1, max_length=50, title='Person Name',
-                                description='This is the person name, It´s between 1 and 50 characters', example='dremian'),
+    name: Optional[str] = Query(None, min_length=1,
+                                max_length=50,
+                                title='Person Name',
+                                description='This is the person name, It´s between 1 and 50 characters',
+                                example='dremian'),
     # no se utiliza obligatorio practicamente nunca
-    age: Optional[int] = Query(..., title='Person Age',
-                               description='This is the person age, It´s required', example=31)
+    age: Optional[int] = Query(...,
+                               title='Person Age',
+                               description='This is the person age, It´s required',
+                               example=31)
 ):
     return {name: age}
 
 # * Validation: Path parameter
-
 # * path parameter es obligatorio
-@app.get('/person/detail/{person_id}')
-def show_person(person_id: int = Path(..., gt=0, title='Person Id',
-                                      description='This is the person ID, It´s greater than 0 and required', example=34)):
+
+
+@app.get('/person/detail/{person_id}', status_code=status.HTTP_200_OK)
+def show_person(person_id: int = Path(..., gt=0,
+                                      title='Person Id',
+                                      description='This is the person ID, It´s greater than 0 and required',
+                                      example=34)):
     return {person_id: 'it exist'}
 
 
-@app.put('/person/{person_id}')
+@app.put('/person/{person_id}', status_code=status.HTTP_202_ACCEPTED)
 def update_person(
-    person_id: int = Path(..., gt=0, title='PersonId',
-                          description='This is the person ID, It´s greater than 0 and required', example=54),
+    person_id: int = Path(..., gt=0,
+                          title='PersonId',
+                          description='This is the person ID, It´s greater than 0 and required',
+                          example=54),
     location: Location = Body(...),
     person: Person = Body(...)
 ):
