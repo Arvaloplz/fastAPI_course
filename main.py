@@ -22,8 +22,8 @@ class Location(BaseModel):
 class Person(BaseModel):
     first_name: str = Field(...,min_length=1, max_length=50)
     last_name: str = Field(..., min_length=1, max_length=50)
-    email: EmailStr = Field(..., min_length=1, max_length=50)
-    age: int = Field(...,default= 1, gt=0,lt=115)
+    email: EmailStr = Field(...)
+    age: int = Field(..., gt=0,lt=115)
     hair_color: Optional[HairColor] = Field(default=None)
     is_married: Optional[bool] = Field(default=None)
 
