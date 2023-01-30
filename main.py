@@ -6,26 +6,40 @@ from fastapi import FastAPI
 from fastapi import Body, Query, Path
 
 
-
 class HairColor(Enum):
     white = 'white'
     black = 'black'
     blue = 'blue'
     green = 'green'
 
+
 class Location(BaseModel):
-    city: str
-    state: str
-    contry: str
+    # * Default body with Field
+    city: str = Field(default=None, example='Calama')
+    state: str = Field(default=None, example='Loa')
+    contry: str = Field(default=None, example='Chile')
 
 
 class Person(BaseModel):
-    first_name: str = Field(...,min_length=1, max_length=50)
+    first_name: str = Field(..., min_length=1, max_length=50)
     last_name: str = Field(..., min_length=1, max_length=50)
     email: EmailStr = Field(...)
-    age: int = Field(..., gt=0,lt=115)
+    age: int = Field(..., gt=0, lt=115)
     hair_color: Optional[HairColor] = Field(default=None)
     is_married: Optional[bool] = Field(default=None)
+
+    class Config:
+        # * Default body
+        schema_extra = {
+            'example': {
+                'first_name': 'Dremian',
+                'last_name': 'Androide',
+                'email': 'arvaloplz@gmail.com',
+                'age': 31,
+                'hair_color': 'white',
+                'is_married': False,
+            }
+        }
 
 
 app = FastAPI()
